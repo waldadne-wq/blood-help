@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>قطرة حياة - طلب فصيلة دم</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; padding:20px;}
+    h1 { color:#b30000; }
+    .container { max-width:700px; margin:auto; background:#fff; padding:20px; border-radius:8px;}
+    label { display:block; margin-top:10px;}
+    input, select { width:100%; padding:8px; margin-top:5px;}
+    button { margin-top:15px; padding:10px; width:100%; background:#b30000; color:#fff; border:none; border-radius:5px;}
+    .request { border-bottom:1px solid #ddd; padding:10px 0;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🩸 قطرة حياة</h1>
+    <p>موقع يربط المحتاجين للدم بالمتبرعين</p>
+
+    <h3>إضافة طلب دم</h3>
+    <label>الاسم</label>
+    <input id="name">
+    <label>فصيلة الدم</label>
+    <select id="blood">
+      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+      <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+    </select>
+    <label>رقم الهاتف</label>
+    <input id="phone">
+    <label>المدينة</label>
+    <input id="city">
+    <button onclick="addRequest()">نشر الطلب</button>
+
+    <h3>الطلبات</h3>
+    <div id="list"></div>
+  </div>
+
+<script>
+function addRequest(){
+  const data = JSON.parse(localStorage.getItem('requests')||'[]');
+  data.push({
+    name: name.value,
+    blood: blood.value,
+    phone: phone.value,
+    city: city.value
+  });
+  localStorage.setItem('requests', JSON.stringify(data));
+  show();
+}
+function show(){
+  const list = document.getElementById('list');
+  list.innerHTML='';
+  const data = JSON.parse(localStorage.getItem('requests')||'[]');
+  data.forEach(r=>{
+    list.innerHTML += `<div class="request">
+      <strong>${r.name}</strong> - ${r.blood} - ${r.city}<br>
+      📞 ${r.phone}
+    </div>`;
+  });
+}
+show();
+</script>
+</body>
+</html>
