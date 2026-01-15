@@ -1,65 +1,98 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>قطرة حياة - طلب فصيلة دم</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; padding:20px;}
-    h1 { color:#b30000; }
-    .container { max-width:700px; margin:auto; background:#fff; padding:20px; border-radius:8px;}
-    label { display:block; margin-top:10px;}
-    input, select { width:100%; padding:8px; margin-top:5px;}
-    button { margin-top:15px; padding:10px; width:100%; background:#b30000; color:#fff; border:none; border-radius:5px;}
-    .request { border-bottom:1px solid #ddd; padding:10px 0;}
-  </style>
+<meta charset="UTF-8">
+<title>طلب تبرع بالدم</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{background:#f0f2f5;font-family:Tahoma;margin:0}
+.screen{max-width:480px;margin:auto;padding:15px}
+h2{text-align:center}
+input,select,button{width:100%;padding:12px;margin:8px 0;font-size:16px;box-sizing:border-box}
+button{background:#25d366;border:none;color:white;border-radius:5px;cursor:pointer}
+.topBar{display:flex;justify-content:space-between;align-items:center;background:#075e54;color:white;padding:10px;border-radius:5px;margin-bottom:10px}
+.card{background:white;padding:10px;border-radius:5px;margin:8px 0}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>🩸 قطرة حياة</h1>
-    <p>موقع يربط المحتاجين للدم بالمتبرعين</p>
 
-    <h3>إضافة طلب دم</h3>
-    <label>الاسم</label>
-    <input id="name">
-    <label>فصيلة الدم</label>
-    <select id="blood">
-      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-      <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
-    </select>
-    <label>رقم الهاتف</label>
-    <input id="phone">
-    <label>المدينة</label>
-    <input id="city">
-    <button onclick="addRequest()">نشر الطلب</button>
+<div id="loginScreen" class="screen">
+<h2>تسجيل الدخول</h2>
+<input id="loginPhone" placeholder="رقم الهاتف">
+<button onclick="login()">دخول</button>
+</div>
 
-    <h3>الطلبات</h3>
-    <div id="list"></div>
-  </div>
+<div id="app" class="screen" style="display:none;">
+<div class="topBar">
+<span>🟢 متصل</span>
+<button onclick="logout()" style="background:#d63031;">تسجيل خروج</button>
+</div>
+
+<h2>طلب تبرع بالدم</h2>
+<input id="username" placeholder="الاسم">
+<input id="phone" placeholder="رقم الهاتف">
+
+<select id="blood">
+<option value="">اختر فصيلة الدم</option>
+<option>A+</option><option>A-</option>
+<option>B+</option><option>B-</option>
+<option>AB+</option><option>AB-</option>
+<option>O+</option><option>O-</option>
+</select>
+
+<select id="city">
+<option value="">اختر المدينة</option>
+<option>بغداد</option>
+<option>البصرة</option>
+<option>أربيل</option>
+<option>الموصل</option>
+</select>
+
+<button onclick="addRequest()">نشر</button>
+<div id="list"></div>
+</div>
 
 <script>
+function login(){
+const phone=document.getElementById('loginPhone').value;
+if(!/^[0-9]{9,12}$/.test(phone)){alert('رقم الهاتف غير صحيح');return;}
+localStorage.setItem('userPhone',phone);startApp();
+}
+function startApp(){
+document.getElementById('loginScreen').style.display='none';
+document.getElementById('app').style.display='block';show();
+}
+function logout(){localStorage.removeItem('userPhone');location.reload();}
+if(localStorage.getItem('userPhone')){startApp();}
+
+function validateForm(name,phone,blood,city){
+if(name.length<3){alert('الاسم قصير');return false;}
+if(!/^[0-9]{9,12}$/.test(phone)){alert('رقم الهاتف غير صحيح');return false;}
+if(blood===''){alert('اختر فصيلة الدم');return false;}
+if(city===''){alert('اختر المدينة');return false;}
+return true;
+}
+
 function addRequest(){
-  const data = JSON.parse(localStorage.getItem('requests')||'[]');
-  data.push({
-    name: name.value,
-    blood: blood.value,
-    phone: phone.value,
-    city: city.value
-  });
-  localStorage.setItem('requests', JSON.stringify(data));
-  show();
+const username=document.getElementById('username');
+const phone=document.getElementById('phone');
+const blood=document.getElementById('blood');
+const city=document.getElementById('city');
+if(!validateForm(username.value,phone.value,blood.value,city.value))return;
+const data=JSON.parse(localStorage.getItem('requests')||'[]');
+data.push({name:username.value,phone:phone.value,blood:blood.value,city:city.value});
+localStorage.setItem('requests',JSON.stringify(data));show();
 }
+
 function show(){
-  const list = document.getElementById('list');
-  list.innerHTML='';
-  const data = JSON.parse(localStorage.getItem('requests')||'[]');
-  data.forEach(r=>{
-    list.innerHTML += `<div class="request">
-      <strong>${r.name}</strong> - ${r.blood} - ${r.city}<br>
-      📞 ${r.phone}
-    </div>`;
-  });
+const list=document.getElementById('list');
+const data=JSON.parse(localStorage.getItem('requests')||'[]');
+list.innerHTML='';
+data.forEach(r=>{
+list.innerHTML+=`<div class="card"><b>${r.name}</b><br>📞 ${r.phone}<br>🩸 ${r.blood} - ${r.city}</div>`;
+});
 }
-show();
 </script>
+
 </body>
 </html>
